@@ -3,9 +3,11 @@
 #include <string>
 #include <boost\bind.hpp>
 
+#define NOT_FOUND (x) ("HTTP/1.1 404 Not Found\nDate:"+(x)+"\nCache-Control: public, max-age=30\nExpires: Date + 30s (Ej: Tue, 04 Sep 2018 18:21:49 GMT)\nContent-Length: 0\nContent-Type: text/html; charset=iso-8859-1")
+
 
 using boost::asio::ip::tcp;
-std::string make_string();
+std::string make_string(char * path);
 Server::Server(boost::asio::io_context& io_context)
 
 	:	context_(io_context),
@@ -83,12 +85,18 @@ void Server::response_sent_cb(const boost::system::error_code& error, size_t byt
 	}
 }
 
-std::string make_string()//cambiar a lo que querramos hacer
+std::string make_string(char * path)//cambiar a lo que querramos hacer
 {
 #pragma warning(disable : 4996)
 	using namespace std;
+	FILE* p;
+	p = fopen(path, "r");
 	time_t now = time(0);
-	return ctime(&now);
+	if (p = NULL) {
+		return NOT_FOUND(ctime(&now));
+	}
+	else {
+		return FOUND;
+	}
 
 }
-
