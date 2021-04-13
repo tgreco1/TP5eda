@@ -67,12 +67,39 @@ void Server::start_answering()
 
 void Server::connection_received_cb(const boost::system::error_code& error) {
 	std::cout << "connection_received_cb" << std::endl;
+
 	if (!error) {
+		boost::asio::async_read_until(socket_, buffer_, "\r\n\r\n",    // Leemos hasta el terminador
+			boost::bind(
+				&Server::message_received_cb,              
+				this,
+				boost::asio::placeholders::error,              
+				boost::asio::placeholders::bytes_transferred)  
+		);
 		start_answering();
 		start_waiting_connection();
 	}
 	else {
 		std::cout << error.message() << std::endl;
+	}
+}
+
+void message_received_cb(const boost::system::error_code& error, size_t bytes_sent)
+{
+	// averiguo si exite o no el path y llam
+	using namespace std;
+	string str;
+	istringstream buf(this->buffer_);
+	buf >> str;
+	FILE* p;
+	p = fopen(&buffer_, "r");
+	if (p == NULL)
+	{
+		this->msg = //??
+	}
+	else
+	{
+		//??
 	}
 }
 
@@ -85,7 +112,7 @@ void Server::response_sent_cb(const boost::system::error_code& error, size_t byt
 	}
 }
 
-std::string make_string(char * path)//cambiar a lo que querramos hacer
+std::string make_string(char * path)//me dicen si se encontro o no y escribo el string correspondiente
 {
 #pragma warning(disable : 4996)
 	using namespace std;
