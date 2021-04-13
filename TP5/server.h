@@ -16,11 +16,15 @@ public:
 	Server(boost::asio::io_context& context);
 	~Server();
 	void start();
+	boost::asio::streambuf buffer_;
+	
 private:
 	void start_waiting_connection();
 	void start_answering();
 	void connection_received_cb(const boost::system::error_code& error);
 	void response_sent_cb(const boost::system::error_code& error, size_t bytes_sent);
+	void message_received_cb (const boost::system::error_code& error, size_t bytes_sent);
+	
 
 	std::string msg;
 
