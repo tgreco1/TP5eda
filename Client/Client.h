@@ -7,7 +7,7 @@
 
 
 #define HOST (std::string)"127.0.0.1"
-#define PATH (std::string) "/img/page/page.html" //aca va link a imagen
+#define PATH (std::string) "img/page/page.html" //aca va link a pagina
 #define PORT 80
 
 class Client

@@ -16,10 +16,13 @@ Client::Client(std::string host_, std::string path_, int port_) : host(host_), p
 
 	error = curl_global_init(CURL_GLOBAL_ALL);
 
-	if (error == CURLE_OK) {
+	if (error == CURLE_OK) 
+	{
 		handler = curl_easy_init();
 		if (handler)
+		{
 			configureClient();
+		}
 		else
 			throw (Error("Failed to initialize handler.\n"));
 	}

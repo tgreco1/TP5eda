@@ -8,7 +8,8 @@ int main(int argC, char** argV) {
 	int out = -1;
 
 	if (getData(argV, argC, &userData)) {
-		try {
+		try 
+		{
 			//Se crea objeto cliente
 			Client myNewClient(userData.host, userData.path, 80);
 
@@ -19,7 +20,8 @@ int main(int argC, char** argV) {
 
 			out = 0;
 		}
-		catch (Error& e) {
+		catch (Error& e) 
+		{
 			std::cout << e.what() << std::endl;
 		}
 	}

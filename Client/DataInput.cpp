@@ -1,11 +1,12 @@
 #include <iostream>
 #include "DataInput.h"
 
-//Recibe dos parametros de la linea de comando, el nonbre del ejecutable y host/path/filename.
+//Recibe dos parametros de la linea de comando, el nombre del ejecutable y host/path/filename.
 #define PARAMS 2
 
 //Separa en host y path/filename, Retorna true si es valido, sino falso.
-bool getData(char** argV, int argC, void* userData) {
+bool getData(char** argV, int argC, void* userData) 
+{
 	Location* userDataPtr = (Location*)userData;
 
 	bool result = false;
