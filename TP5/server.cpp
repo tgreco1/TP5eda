@@ -3,7 +3,7 @@
 #include <string>
 #include <boost\bind.hpp>
 
-#define NOT_FOUND (x) ("HTTP/1.1 404 Not Found\nDate:"+(x)+"\nCache-Control: public, max-age=30\nExpires: Date + 30s (Ej: Tue, 04 Sep 2018 18:21:49 GMT)\nContent-Length: 0\nContent-Type: text/html; charset=iso-8859-1")
+//#define NOT_FOUND (x) ("HTTP/1.1 404 Not Found\nDate:"+(x)+"\nCache-Control: public, max-age=30\nExpires: Date + 30s (Ej: Tue, 04 Sep 2018 18:21:49 GMT)\nContent-Length: 0\nContent-Type: text/html; charset=iso-8859-1")
 
 
 using boost::asio::ip::tcp;
@@ -14,6 +14,7 @@ Server::Server(boost::asio::io_context& io_context)
 	acceptor_(io_context,tcp::endpoint(tcp::v4(),13)),
 	socket_(io_context)
 {
+
 }
 
 Server::~Server()
@@ -46,10 +47,10 @@ void Server::start_waiting_connection()
 } 
 
 
-void Server::start_answering()
+void Server::start_answering(std::string msg)
 {
 	std::cout << "start_answering()" << std::endl;
-	msg = make_string();
+	//msg = make_string();
 	boost::asio::async_write(
 		socket_,
 		boost::asio::buffer(msg),
@@ -76,7 +77,7 @@ void Server::connection_received_cb(const boost::system::error_code& error) {
 				boost::asio::placeholders::error,              
 				boost::asio::placeholders::bytes_transferred)  
 		);
-		start_answering();
+		//start_answering();
 		start_waiting_connection();
 	}
 	else {
@@ -84,22 +85,29 @@ void Server::connection_received_cb(const boost::system::error_code& error) {
 	}
 }
 
-void message_received_cb(const boost::system::error_code& error, size_t bytes_sent)
+void Server::message_received_cb(const boost::system::error_code& error, size_t bytes_sent)
 {
 	// averiguo si exite o no el path y llam
 	using namespace std;
-	string str;
-	istringstream buf(this->buffer_);
-	buf >> str;
-	FILE* p;
-	p = fopen(&buffer_, "r");
-	if (p == NULL)
+	
+    std::istream is(&buffer_);
+    std::string buf;
+    std::getline(is, buf);
+	
+	cout << buf << endl;
+	
+	const char* test = buf.c_str();
+	FILE* filePointer;
+	//errno_t err; 
+	if ((fopen_s(&filePointer, test, "r")) != 0) //error al abrirlo
 	{
-		this->msg = //??
+		msg = "No encontro el archivo\n";
+		start_answering(msg);
 	}
 	else
 	{
-		//??
+		msg = "Encontro el archivo\n";
+		start_answering(msg);
 	}
 }
 
@@ -112,18 +120,18 @@ void Server::response_sent_cb(const boost::system::error_code& error, size_t byt
 	}
 }
 
-std::string make_string(char * path)//me dicen si se encontro o no y escribo el string correspondiente
-{
-#pragma warning(disable : 4996)
-	using namespace std;
-	FILE* p;
-	p = fopen(path, "r");
-	time_t now = time(0);
-	if (p = NULL) {
-		return NOT_FOUND(ctime(&now));
-	}
-	else {
-		return FOUND;
-	}
-
-}
+//std::string make_string(char * path)//me dicen si se encontro o no y escribo el string correspondiente
+//{
+//#pragma warning(disable : 4996)
+//	using namespace std;
+//	FILE* p;
+//	p = fopen(path, "r");
+//	time_t now = time(0);
+//	if (p = NULL) {
+//		return NOT_FOUND(ctime(&now));
+//	}
+//	else {
+//		return FOUND;
+//	}
+//
+//}
