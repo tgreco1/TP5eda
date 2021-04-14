@@ -10,6 +10,11 @@
 #include <boost/asio.hpp>
 #include <string>
 
+#define HOST (std::string) "127.0.0.1"
+#define PATH (std::string) "page"
+#define FILENAME (std::string) "page.html" 
+
+
 class Server
 {
 public:
@@ -20,7 +25,7 @@ public:
 	
 private:
 	void start_waiting_connection();
-	void start_answering(std::string msg);
+	void start_answering(bool isOk);
 	void connection_received_cb(const boost::system::error_code& error);
 	void response_sent_cb(const boost::system::error_code& error, size_t bytes_sent);
 	void message_received_cb (const boost::system::error_code& error, size_t bytes_sent);
