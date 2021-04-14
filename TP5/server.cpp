@@ -72,7 +72,7 @@ void Server::start_answering(bool isOk)
 	std::cout << "start_answering()" << std::endl;
 	
 	//Abro archivo
-	std::fstream pag(FILENAME, std::ios::in | std::ios::binary);
+	std::fstream pag("Page/" + FILENAME, std::ios::in | std::ios::binary);
 
 	/*Checks if file was correctly open.*/
 	if (!pag.is_open()) 
@@ -158,9 +158,11 @@ void Server::message_received_cb(const boost::system::error_code& error, size_t 
 	if (!error)
 	{
 		//Se obtiene mensaje en formate de string, guardado message
-		std::istream is(&buffer_);
-		std::string message;
-		std::getline(is, message);
+		//std::istream is(&buffer_);
+		//std::string message;
+		//std::getline(is, message);
+
+		std::string message((std::istreambuf_iterator<char>(&buffer_)), std::istreambuf_iterator<char>());
 
 		std::string validFormat = "GET /" + PATH + '/' + FILENAME + " HTTP/1.1\r\nHost: " + HOST + "\r\n";
 		bool isOk = false;
