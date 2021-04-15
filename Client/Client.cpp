@@ -57,6 +57,7 @@ void Client::configureClient(void)
 	curl_easy_setopt(handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTP);
 	curl_easy_setopt(handler, CURLOPT_WRITEFUNCTION, &writeCallback);
 	curl_easy_setopt(handler, CURLOPT_WRITEDATA, this);
+	curl_easy_setopt(handler, CURLOPT_VERBOSE, 1L);
 }
 
 //Callback para escribir, hace un append a this->message.
@@ -73,17 +74,24 @@ size_t writeCallback(char* ptr, size_t size, size_t nmemb, void* userData)
 
 	output.write(ptr, nmemb);
 
+	
+	std::stringstream buffer;
+	buffer << output.rdbuf();
+	std::string strtest = buffer.str();
+
+
 	return size * nmemb;
 }
 
 //Getter de mensaje
 std::fstream& Client::getBuffer(void)
 { 
-	return message; 
+	return this->message; 
 }
 
 void Client::openFile(void) 
 {
+	
 	std::string filename;
 	std::string ctnt;
 	int pos = path.find_last_of('.');
@@ -97,19 +105,18 @@ void Client::openFile(void)
 		ctnt = contentType;
 
 		if (pos == std::string::npos || pos == path.length())
-			filename = removeBar(path);
-
-		else 
 		{
-			filename = path.substr(0, pos);
-			filename = removeBar(filename);
+			filename = removeBar(path);
 		}
+		
+		filename = path.substr(0, pos); //Page/page.html -> Page/page
+		
+		int posBar = filename.find_last_of('/');
+		filename = filename.substr(0, posBar);
+		
 
-		if (filename.length() > fileNameSize)
-			filename = filename.substr(filename.length() - fileNameSize, fileNameSize);
-
-		pos = ctnt.find('/');
-		ctnt = ctnt.substr(pos + 1, ctnt.length() - pos);
+		ctnt = ctnt.substr(0, pos);
+		ctnt = ctnt.substr(5, ctnt.length());
 
 		message.open((filename + '.' + ctnt).c_str(), std::ios::out | std::ios::binary);
 		if (!message.is_open()) 

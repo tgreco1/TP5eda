@@ -87,7 +87,7 @@ void Server::start_answering(bool isOk)
 
 	this->file_size = size;
 
-	std::cout << "Size of the file is" << " " << file_size << " " << "bytes";
+	std::cout << "Size of the file is" << " " << file_size << " " << "bytes" << std::endl;
 
 	this->answer = generateAnswer(isOk);
 
@@ -102,7 +102,7 @@ void Server::start_answering(bool isOk)
 
 	boost::asio::async_write(
 		socket_,
-		boost::asio::buffer(answer),
+		boost::asio::buffer(this->answer),
 		boost::bind(
 			&Server::response_sent_cb,
 			this,
@@ -142,7 +142,7 @@ void Server::response_sent_cb(const boost::system::error_code& error, size_t byt
 	std::cout << "response_sent_cb()" << std::endl;
 	if (!error)
 	{
-		std::cout << "Response sent correctly!" << bytes_sent << "bytes" << std::endl;
+		std::cout << "Response sent correctly! " << bytes_sent << "bytes" << std::endl;
 	}
 	else
 	{
@@ -158,9 +158,7 @@ void Server::message_received_cb(const boost::system::error_code& error, size_t 
 	if (!error)
 	{
 		//Se obtiene mensaje en formate de string, guardado message
-		//std::istream is(&buffer_);
-		//std::string message;
-		//std::getline(is, message);
+		
 
 		std::string message((std::istreambuf_iterator<char>(&buffer_)), std::istreambuf_iterator<char>());
 
@@ -221,92 +219,7 @@ std::string Server::generateAnswer(bool isOk)
 	return response;
 }
 
-/*std::char* timeplus30s(std::char* currentTime)//Www Mmm dd hh:mm:ss yyyy
-{
 
-jan
-feb
-mar
-apr
-may
-jun
-jul
-aug
-sep
-nov
-dic
-
-mon
-tue
-wed
-thu
-fri
-sat
-sun
-
-
-
-//Where Www is the weekday, Mmm the month (in letters), dd the day of the month, hh:mm:ss the time, and yyyy the year.
-
-	//char arr[5] = (currentTime + 9);
-	int i;
-	while(currentTime[i] != ':')
-	{
-		i++;
-	}
-	if (currentTime[i + 4] >= '3')//si ya pasaron los 30 segundos
-	{
-		if (currentTime[i + 2] != '9')//si no pasaron los 9 minutos
-			currentTime[i + 2] += 1;
-		else
-		{
-			currentTime[i + 2] = '0';
-			if (currentTime[i + 1] == '5')//si estamos en el minuto 59 y le sumo un minuto
-			{
-				if(currentTime[i-1] == '3' && currentTime[i-2]=='2')//si estamos en la hora 23 y le sumo un minuto
-				{
-					if(currentTime[i-4]== 9 )
-						currentTime[i-5]++;
-						currentTime[i-2]='0';
-						currentTime[i-1]='0';
-						currentTime[i+1]='0';
-						currentTime[i+2]='0';
-						currentTime[i+4]='0';
-						currentTime[i+5]='0';
-					else
-					{
-
-					}
-
-				}
-				else
-				{
-					currentTime[i + 1]++;
-				}
-			}
-			else
-			{
-				currentTime[i + 1]++;
-			}
-		}
-	}
-	else if(currentTime[i+4]<'3' && currentTime[i+4]>='0')
-	{
-		currentTime[i+4]+= 3;
-	}
-	/*
-	si 28:59
-	29:29
-	// martes abril 23:55:59
-
-
-
-	
-	return currentTime;
-
-}*/
-
-//true +=30
 std::string Server::makeDateString(bool param)
 {
 	using namespace std::chrono;

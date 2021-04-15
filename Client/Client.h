@@ -4,6 +4,7 @@
 #include <curl/curl.h>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 
 #define HOST (std::string)"127.0.0.1"
