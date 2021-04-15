@@ -3,8 +3,6 @@
 #include <string>
 #include <boost\bind.hpp>
 
-//#define NOT_FOUND (x) ("HTTP/1.1 404 Not Found\nDate:"+(x)+"\nCache-Control: public, max-age=30\nExpires: Date + 30s (Ej: Tue, 04 Sep 2018 18:21:49 GMT)\nContent-Length: 0\nContent-Type: text/html; charset=iso-8859-1")
-
 
 using boost::asio::ip::tcp;
 
@@ -14,7 +12,7 @@ Server::Server(boost::asio::io_context& io_context)
 	acceptor_(io_context,tcp::endpoint(tcp::v4(), 80)),
 	socket_(io_context)
 {
-	if (socket_.is_open()) //TODO si hay errores de inciilizacion es por esto
+	if (socket_.is_open()) 
 	{
 		socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 		socket_.close();
@@ -49,10 +47,10 @@ void Server::start()
 	start_waiting_connection();
 }
 
-void Server::start_waiting_connection()
+void Server::start_waiting_connection()		//espera una conexion
 {
 	std::cout << "start_waiting_connection()" << std::endl;
-	if (socket_.is_open()) 
+	if (socket_.is_open())		
 	{
 		std::cout << "Error: can't accept new connection from an open socket" << std::endl;
 		return;
@@ -63,7 +61,7 @@ void Server::start_waiting_connection()
 		std::cout << "Waiting for connection." << std::endl;
 		acceptor_.async_accept(socket_, boost::bind(&Server::connection_received_cb, this, boost::asio::placeholders::error));
 	}
-	answer.clear();
+	answer.clear();		//en caso de que quedara el string de answer con un mensaje anterior
 } 
 
 
@@ -74,7 +72,7 @@ void Server::start_answering(bool isOk)
 	//Abro archivo
 	std::fstream pag("Page/" + FILENAME, std::ios::in | std::ios::binary);
 
-	/*Checks if file was correctly open.*/
+	//Verifica si el archivo fue abierto de manera correcta
 	if (!pag.is_open()) 
 	{
 		std::cout << "Failed to open file\n";
@@ -82,7 +80,7 @@ void Server::start_answering(bool isOk)
 	}
 
 	pag.seekg(0, pag.end);
-	int size = pag.tellg();
+	int size = pag.tellg();		//obtiene el largo del archivo
 	pag.seekg(0, pag.beg);
 
 	this->file_size = size;
@@ -97,10 +95,10 @@ void Server::start_answering(bool isOk)
 		ss << pag.rdbuf();
 		this->answer += ss.str();
 	}
-	this->answer += "\r\n\r\n";
+	this->answer += "\r\n\r\n";		//añade el terminador a la respuesta
 
 
-	boost::asio::async_write(
+	boost::asio::async_write(		//envia la respuesta
 		socket_,
 		boost::asio::buffer(this->answer),
 		boost::bind(
@@ -128,8 +126,7 @@ void Server::connection_received_cb(const boost::system::error_code& error) {
 				boost::asio::placeholders::error,              
 				boost::asio::placeholders::bytes_transferred)  
 		);
-		//start_answering();
-		//start_waiting_connection();
+
 	}
 	else {
 		std::cout << error.message() << std::endl;
@@ -160,15 +157,15 @@ void Server::message_received_cb(const boost::system::error_code& error, size_t 
 		//Se obtiene mensaje en formate de string, guardado message
 		
 
-		std::string message((std::istreambuf_iterator<char>(&buffer_)), std::istreambuf_iterator<char>());
+		std::string message((std::istreambuf_iterator<char>(&buffer_)), std::istreambuf_iterator<char>());		//obtiene el mensaje enviado por el cliente, guardado en el buffer
 
 		std::string validFormat = "GET /" + PATH + '/' + FILENAME + " HTTP/1.1\r\nHost: " + HOST + "\r\n";
 		bool isOk = false;
 
 		int len = message.length();
-		if (message.find(validFormat) == 0)
+		if (message.find(validFormat) == 0)		//verifica el mensaje
 		{
-			if (len > validFormat.length() && message[len - 2] == '\r' && message[len - 1] == '\n')
+			if (len > validFormat.length() && message[len - 2] == '\r' && message[len - 1] == '\n') 
 			{
 				isOk = true;
 			}
@@ -178,11 +175,11 @@ void Server::message_received_cb(const boost::system::error_code& error, size_t 
 			std::cout << "Wrong input sent." << std::endl;
 		}
 
-		start_answering(isOk);
+		start_answering(isOk);		//si no ocurrieron errores se genera la respuesta
 	}
 	else
 	{
-		std::cout << error.message() << std::endl;
+		std::cout << error.message() << std::endl;		//si ocurrieron aparece un mensaje de error
 	}
 
 
@@ -191,18 +188,15 @@ void Server::message_received_cb(const boost::system::error_code& error, size_t 
 
 std::string Server::generateAnswer(bool isOk)
 {
-	std::string date = makeDateString(false);
+	std::string date = makeDateString(false); //obtiene la fecha
 	
-	std::string dateLater = makeDateString(true);
+	std::string dateLater = makeDateString(true); //obtiene la fecha mas 30 segundos
 	
-	std::string response;
+	std::string response; 
 	
-	/*time_t now = time(0);
-	std::string date_time = ctime(&now); //This method returns a pointer to a string that holds the date and time in the form of dayday monthmonth yearyear hours:minutes:seconds
-	date = date_time;*/ 
 
 
-	if (isOk)
+	if (isOk)	//si encontro el archivo
 	{
 		response =
 			"HTTP/1.1 200 OK\r\nDate:" + date + "Location: " + HOST + '/' + PATH + '/' + FILENAME + "\r\nCache-Control:  max-age=30\r\nExpires:"
@@ -220,16 +214,16 @@ std::string Server::generateAnswer(bool isOk)
 }
 
 
-std::string Server::makeDateString(bool param)
+std::string Server::makeDateString(bool param) 
 {
 	using namespace std::chrono;
-	system_clock::time_point theTime = system_clock::now();
+	system_clock::time_point theTime = system_clock::now(); //obtiene la fecha actual
 
 	if (param)
 	{
-		theTime += seconds(30);
+		theTime += seconds(30);		//suma 30 segundos 
 	}
 
 	time_t now = system_clock::to_time_t(theTime);
-	return ctime(&now);
+	return ctime(&now);		//devuelve el tiempo en forma de string
 }

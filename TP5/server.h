@@ -35,9 +35,9 @@ private:
 	void response_sent_cb(const boost::system::error_code& error, size_t bytes_sent);
 	void message_received_cb (const boost::system::error_code& error, size_t bytes_sent);
 
-	std::string makeDateString(bool param);
+	std::string makeDateString(bool param); //funcion que devuelve un string con la fecha. Recibe un bool que indica si hay que sumar 30 segundos o no
 
-	std::string generateAnswer(bool isOk);
+	std::string generateAnswer(bool isOk); //funcion que genera los strings de respuesta, dependiendo si el archivo fue encontrado o no
 
 	std::string answer;
 
